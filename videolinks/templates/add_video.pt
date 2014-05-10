@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head>
+  <title>Youtube share</title>
+  <style>
+  label {
+    width: 100px;
+    display: inline-block;
+  }
+  </style>
+</head>
+<body>
+  <div>  
+    <form action="${save_url}" method="post">
+      <label style="width:100px">URL:</label><input type="text" name="url" 
+                tal:content="video.url"/><br/>
+      <label>Title:</label><input type="text" name="title" 
+                tal:content="video.title"/><br/>
+      <label>Description:</label><textarea name="description" 
+                rows="10" cols="60" tal:content="video.description"/><br/>
+      <input type="submit" name="form.submitted" value="Save"/>          
+    </form>
+  
+  </div>  
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head>
+  <title>Youtube share</title>
+</head>
+<body>
+  <span tal:condition="logged_in">
+    Logged in as: ${logged_in}
+    <a href="${request.application_url}/logout">Logout</a>
+  </span>
+  <span tal:condition="not logged_in">
+    <a href="${request.application_url}/login">Login</a>
+  
+  </span>
+  <br>
+  <a tal:attributes="href add_video">Add a video</a>
+  <div style="width:800px">
+    <ul>
+      <li tal:repeat="video videos">
+       
+        <a href="${video.url}"><h4>${video.title}</h4></a>
+        ${video.description[:300]}<span tal:condition=
+              "python:len(video.description) > 300">...</span>
+        <br>      
+        <a tal:condition="python:logged_in == video.owner_handler" 
+          href="${request.application_url}/delete_video/${video.id}">delete</a>
+      </li>
+    </ul>  
+  </div>
+</body>
+</html>
