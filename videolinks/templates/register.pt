@@ -13,11 +13,21 @@
   <link rel="stylesheet"
         href="${request.static_url('videolinks:static/pylons.css')}"
         type="text/css" media="screen" charset="utf-8" />
-  <!--[if lte IE 6]>
-  <link rel="stylesheet"
-        href="${request.static_url('videolinks:static/ie6.css')}"
-        type="text/css" media="screen" charset="utf-8" />
-  <![endif]-->
+  <script>
+    // TODO: check id as well (no space, etc.) 
+    // TODO: change to jQuery
+    function check_password() {
+      var password = document.getElementById("password");
+      var confirm_password = document.getElementById("confirm_password");
+      var ok = true;
+      if (password.value != confirm_password.value) {
+        password.style.borderColor = "#E34234";
+        confirm_password.style.borderColor = "#E34234";
+        ok = false;
+      }
+      return ok;
+    }
+  </script>
 </head>
 <body>
   <div id="wrap">
@@ -31,7 +41,7 @@
     <div id="middle">
       <div class="middle align-right">
         <div id="left" class="app-welcome align-left">
-          <b>Login</b><br/>
+          <b>Register</b><br/>
           <span tal:replace="message"/>
         </div>
         <div id="right" class="app-welcome align-right"></div>
@@ -39,14 +49,16 @@
     </div>
     <div id="bottom">
       <div class="bottom">
-        <form action="${url}" method="post">
-          <input type="hidden" name="came_from" value="${came_from}"/>
+        <form action="${url}" method="post" onsubmit="return check_password()">
           <label for="handler">Name</label>
           <input type="text" name="handler" value="${handler}"/><br/>
           <label for="password">Password</label>
-          <input type="password" name="password"
-                 value="${password}"/><br/>
-          <input type="submit" name="form.submitted" value="Log In"/>
+          <input type="password" id="password"
+            name="password" value="${password}"/><br/>
+          <label for="confirm_password">Confirm password</label>
+          <input type="password" id="confirm_password" 
+            name="confirm_password" value=""/><br/>       
+          <input type="submit" name="form.submitted" value="Register"/>
         </form>
       </div>
     </div>

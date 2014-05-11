@@ -18,6 +18,7 @@ def add_route(config):
 
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('register', '/register')
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.

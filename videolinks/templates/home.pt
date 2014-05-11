@@ -12,7 +12,7 @@
   </span>
   <span tal:condition="not logged_in">
     <a href="${request.application_url}/login">Login</a>
-  
+    <a href="${request.application_url}/register">Register</a>
   </span>
   <br>
   <a tal:attributes="href add_video">Add a video</a>

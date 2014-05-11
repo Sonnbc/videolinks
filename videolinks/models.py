@@ -73,9 +73,10 @@ class Video(Base):
 
 class User(Base):
   __tablename__ = 'users'
-  handler = Column(String(50), primary_key=True)
   __hashed_password = Column(Integer, nullable=False)
 
+  handler = Column(String(50), primary_key=True)
+  
   @property
   def password(self):
      raise Exception("Retrieving password is not possible")

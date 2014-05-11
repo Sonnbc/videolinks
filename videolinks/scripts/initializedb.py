@@ -42,9 +42,5 @@ def main(argv=sys.argv):
     
 
     with transaction.manager:
-        user0 = User(handler='asdasd', password='123123')
-        user1 = User(handler='qweqwe', password='111111')
-        DBSession.add(user0)
-        DBSession.add(user1)
-        #add default videos here
+        #add entries to database here
         pass

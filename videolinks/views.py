@@ -26,11 +26,14 @@ from .DBHelper import (
   get_video
   )
 
+import feed
+
 
 @view_config(route_name='home', renderer='templates/home.pt')
 def frontpage(request):
   add_video_url = request.route_url('add_video')
-  all_videos = DBSession.query(Video).all()
+  all_videos = feed.get_feed(request.authenticated_userid)
+  
   return {'videos': all_videos, 'add_video': add_video_url,
       'logged_in': request.authenticated_userid}
 
@@ -63,40 +66,64 @@ def delete_video(request):
   DBSession.delete(video)
   return HTTPFound(location = request.route_url('home'))
 
+@view_config(route_name='register', renderer='templates/register.pt')
+def register(request):
+  handler = ''
+  password = ''
+  message = ''
+  if 'form.submitted' in request.params:
+    handler = request.params['handler']
+    password = request.params['password']
+    user = get_user(handler)
+    if not user:
+      user = User(handler=handler, password=password)
+      DBSession.add(user)
+      headers = remember(request, handler)
+      return HTTPFound(location=request.route_url('home'),
+                      headers = headers)
+    message = "Username taken"
+
+  return dict(
+    message = message,
+    url = request.application_url + '/register',
+    handler = handler,
+    password = password
+  )  
+
 @view_config(route_name='login', renderer='templates/login.pt')
 @forbidden_view_config(renderer='templates/login.pt')
 def login(request):
-    login_url = request.route_url('login')
-    referrer = request.url
-    if referrer == login_url:
-        referrer = '/' # never use the login form itself as came_from
-    came_from = request.params.get('came_from', referrer)
-    message = ''
-    login = ''
-    password = ''
-    if 'form.submitted' in request.params:
-        login = request.params['login']
-        password = request.params['password']
-        user = get_user(login)
-        if user and user.authenticate(password):
-            headers = remember(request, login)
-            return HTTPFound(location = came_from,
-                             headers = headers)
-        message = 'Failed login'
+  login_url = request.route_url('login')
+  referrer = request.url
+  if referrer == login_url:
+    referrer = '/' # never use the login form itself as came_from
+  came_from = request.params.get('came_from', referrer)
+  message = ''
+  handler = ''
+  password = ''
+  if 'form.submitted' in request.params:
+    handler = request.params['handler']
+    password = request.params['password']
+    user = get_user(handler)
+    if user and user.authenticate(password):
+      headers = remember(request, handler)
+      return HTTPFound(location = came_from,
+                       headers = headers)
+    message = 'Failed login'
 
-    return dict(
-        message = message,
-        url = request.application_url + '/login',
-        came_from = came_from,
-        login = login,
-        password = password,
-        )
+  return dict(
+    message = message,
+    url = request.application_url + '/login',
+    came_from = came_from,
+    handler = handler,
+    password = password,
+    )
 
 @view_config(route_name='logout')
 def logout(request):
-    headers = forget(request)
-    return HTTPFound(location = request.route_url('home'),
-                     headers = headers)
+  headers = forget(request)
+  return HTTPFound(location = request.route_url('home'),
+                   headers = headers)
 
 
 

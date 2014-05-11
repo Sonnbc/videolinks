@@ -13,7 +13,6 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 from sqlalchemy.orm.exc import NoResultFound
 
 def groupfinder(handler, request):
-  print "groupfinder:", handler
   return []
 
 def get_user(handler):
