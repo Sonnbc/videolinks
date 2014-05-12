@@ -20,12 +20,8 @@ from .models import (
   User
   )
 
-from .DBHelper import (
-  DBSession, 
-  get_user,
-  get_video
-  )
-
+import DBHelper
+from DBHelper import DBSession
 import feed
 
 
@@ -34,8 +30,7 @@ def frontpage(request):
   add_video_url = request.route_url('add_video')
   all_videos = feed.get_feed(request.authenticated_userid)
   
-  return {'videos': all_videos, 'add_video': add_video_url,
-      'logged_in': request.authenticated_userid}
+  return {'videos': all_videos, 'logged_in': request.authenticated_userid}
 
 @view_config(route_name='add_video', renderer='templates/add_video.pt',
   permission='add_video')
@@ -45,7 +40,7 @@ def add_video(request):
     description = request.params['description']
     url = request.params['url']
     handler = request.authenticated_userid
-    user = get_user(handler)
+    user = DBHelper.get_user(handler)
     if not user:
       raise Exception("User not found. This is impossible!")
 
@@ -62,7 +57,7 @@ def add_video(request):
 @view_config(route_name='delete_video', permission='delete_video')
 def delete_video(request):
   video_id = request.matchdict['video_id']
-  video = get_video(video_id)
+  video = DBHelper.get_video(video_id)
   DBSession.delete(video)
   return HTTPFound(location = request.route_url('home'))
 
@@ -74,7 +69,7 @@ def register(request):
   if 'form.submitted' in request.params:
     handler = request.params['handler']
     password = request.params['password']
-    user = get_user(handler)
+    user = DBHelper.get_user(handler)
     if not user:
       user = User(handler=handler, password=password)
       DBSession.add(user)
@@ -88,7 +83,7 @@ def register(request):
     url = request.application_url + '/register',
     handler = handler,
     password = password
-  )  
+    )  
 
 @view_config(route_name='login', renderer='templates/login.pt')
 @forbidden_view_config(renderer='templates/login.pt')
@@ -96,7 +91,8 @@ def login(request):
   login_url = request.route_url('login')
   referrer = request.url
   if referrer == login_url:
-    referrer = '/' # never use the login form itself as came_from
+    # never use the login form itself as came_from
+    referrer = request.route_url('home') 
   came_from = request.params.get('came_from', referrer)
   message = ''
   handler = ''
@@ -104,7 +100,7 @@ def login(request):
   if 'form.submitted' in request.params:
     handler = request.params['handler']
     password = request.params['password']
-    user = get_user(handler)
+    user = DBHelper.get_user(handler)
     if user and user.authenticate(password):
       headers = remember(request, handler)
       return HTTPFound(location = came_from,
@@ -124,6 +120,24 @@ def logout(request):
   headers = forget(request)
   return HTTPFound(location = request.route_url('home'),
                    headers = headers)
+
+#TODO: this should not be a view handler (just REST)
+#TODO: this is not really efficient (have to reload the whole referer page)
+@view_config(route_name='vote_video')
+def vote_video(request):
+  handler = request.authenticated_userid
+  vote = request.matchdict['vote']
+  video_id = request.matchdict['video_id']
+  DBHelper.vote_video(handler, video_id, vote)
+
+  referrer = request.referrer
+  this_url = request.route_url('vote_video', video_id=video_id, vote=vote)
+
+  if (not referrer) or referrer == this_url:
+    referrer = request.route_url('home')
+
+  return HTTPFound(location = referrer)
+
 
 
 

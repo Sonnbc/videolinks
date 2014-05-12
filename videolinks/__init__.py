@@ -20,6 +20,10 @@ def add_route(config):
     config.add_route('logout', '/logout')
     config.add_route('register', '/register')
 
+    config.add_route('vote_video', '/vote_video/{video_id}/{vote}',
+        traverse='/videos')
+
+
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """

@@ -6,6 +6,7 @@ from sqlalchemy import (
   String,
   PickleType,
   ForeignKey,
+  DateTime
   )
 
 from sqlalchemy.ext.declarative import (
@@ -37,7 +38,8 @@ class RootFactory(dict):
     self['videos'] = VideoFactory(self, 'videos')
 
 class VideoFactory(object):
-  __acl__ = [ (Allow, Authenticated, 'add_video')]
+  __acl__ = [ (Allow, Authenticated, 'add_video'),
+              (Allow, Authenticated, 'vote_video')]
 
   def __init__(self, parent, name):
     self.__parent__ = parent
@@ -65,10 +67,12 @@ class Video(Base):
   owner_handler = Column(Integer, ForeignKey('users.handler'))
   owner = relationship("User")
 
+  votes = relationship("VideoVote", backref="video", 
+    cascade="all, delete, delete-orphan")
+
   @property
   def __acl__(self):
     acls = [ (Allow, self.owner_handler, 'delete_video') ]
-    print "acls:", acls
     return acls
 
 class User(Base):
@@ -94,4 +98,19 @@ class User(Base):
   def hash(self, value):
     return hashlib.sha512(value + salt).hexdigest()
 
+  votes = relationship("VideoVote", backref="user", 
+    cascade="all, delete, delete-orphan")
 
+class VideoVote(Base):
+  __tablename__ = "videovotes"
+  user_handler = Column(String(50), ForeignKey('users.handler'), 
+    primary_key=True)
+  video_id = Column(Integer, ForeignKey('videos.id'),
+    primary_key=True)
+
+  vote_time = Column(DateTime)
+
+  #vote count is either 1 (upvote), 0 (no vote), or -1 (downvote)
+  #we want vote_time to be the first time the user votes on a video
+  #to avoid user unvoting and revoting a video to change vote_time
+  vote_count = Column(Integer)
