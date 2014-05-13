@@ -18,18 +18,16 @@
   <a href="${request.application_url}/add_video">Add a video</a>
   <div style="width:800px">
     <ul>
-      <li tal:repeat="video videos">
-       
+      <li tal:repeat="(video, votes, voted) videos">
         <a href="${video.url}"><h4>${video.title}</h4></a>
         ${video.description[:300]}<span tal:condition=
               "python:len(video.description) > 300">...</span>
         <br>
-        <div tal:define="voted_users [x.user_handler for x in video.votes];
-          voted logged_in in voted_users">
-        <span tal:condition="voted">upvoted</span>
-        <a tal:condition="not voted" href="${request.application_url}/vote_video/${video.id}/1">upvote</a> 
-        <span>score:${len(voted_users)}</span>
-        </div>
+        <a tal:condition="python:voted == 1" 
+          href="${request.application_url}/vote_video/${video.id}/0">un-upvote</a>
+        <a tal:condition="python:voted == 0" 
+          href="${request.application_url}/vote_video/${video.id}/1">upvote</a> 
+        <span>score:${votes}</span>
         <a tal:condition="python:logged_in == video.owner_handler" 
           href="${request.application_url}/delete_video/${video.id}">delete</a>
       </li>

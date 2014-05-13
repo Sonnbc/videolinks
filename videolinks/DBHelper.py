@@ -6,7 +6,8 @@ from .models import (
 
 from sqlalchemy.orm import (
   scoped_session,
-  sessionmaker
+  sessionmaker,
+  exc
   )
 
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -38,9 +39,14 @@ def vote_video(user_handler, video_id, vote_kind):
   if vote_kind not in [0, 1]:
     return
 
-  vote = VideoVote(user_handler=user_handler, video_id=video_id,
-    vote_time=datetime.now(), vote_count=vote_kind)
-  DBSession.add(vote)
+  try:
+    vote = DBSession.query(VideoVote).filter_by(
+      user_handler=user_handler, video_id=video_id).one()
+    vote.vote_count = vote_kind
+  except exc.NoResultFound:
+    vote = VideoVote(user_handler=user_handler, video_id=video_id,
+      vote_time=datetime.now(), vote_count=vote_kind)
+    DBSession.add(vote)
 
 
 
