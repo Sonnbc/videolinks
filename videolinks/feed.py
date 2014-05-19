@@ -10,6 +10,7 @@ from sqlalchemy.sql import func
 
 def get_feed(user_handler):
   #sort by votes count
+  #currently returns only 9 videos
   #TODO: try to be more efficient. perhaps 1 SQL call only?
   all_videos = DBSession.query(Video).all()
 
@@ -26,11 +27,8 @@ def get_feed(user_handler):
             user_handler=user_handler, video_id=x.id, vote_count=1).first() ]
   }
     
-  print "This is votes: ", votes
   all_videos = sorted(all_videos, key=lambda x: votes[x.id][0], reverse=True)
-  print [(x.id, votes[x.id]) for x in all_videos]
   all_videos = [
-    (x, votes[x.id][0], votes[x.id][1]) for x in all_videos
+    (x, votes[x.id][0], votes[x.id][1]) for x in all_videos[:9]
   ]
-  print all_videos
   return all_videos

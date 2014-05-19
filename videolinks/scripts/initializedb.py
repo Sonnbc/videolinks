@@ -43,4 +43,10 @@ def main(argv=sys.argv):
 
     with transaction.manager:
         #add entries to database here
+        user = User(handler="son", password="123123")
+        DBSession.add(user)
+        for i in range(0,100):
+            video = Video(title="AMAZING STREET HACK", url="https://www.youtube.com/watch?v=1hpU_Neg1KA",
+                owner=user, description="An amazing smartphone app turns common people into powerful hackers and hidden cameras record their reaction as they unwillingly hack a street of Los Angeles. You won't believe what they do when the police show up! Experience the power of hacking in Watch Dogs on May 27, 2014.")
+            DBSession.add(video)
         pass
