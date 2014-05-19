@@ -4,34 +4,91 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal">
 <head>
   <title>Youtube share</title>
+  <link rel="stylesheet"
+        href="${request.static_url('videolinks:static/custom.css')}"
+        type="text/css" media="screen" charset="utf-8" />
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" />
+  <!-- Latest compiled and minified JavaScript -->
+  <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script> 
 </head>
+
 <body>
-  <span tal:condition="logged_in">
-    Logged in as: ${logged_in}
-    <a href="${request.application_url}/logout">Logout</a>
-  </span>
-  <span tal:condition="not logged_in">
-    <a href="${request.application_url}/login">Login</a>
-    <a href="${request.application_url}/register">Register</a>
-  </span>
-  <br>
-  <a href="${request.application_url}/add_video">Add a video</a>
-  <div style="width:800px">
-    <ul>
-      <li tal:repeat="(video, votes, voted) videos">
-        <a href="${video.url}"><h4>${video.title}</h4></a>
-        ${video.description[:300]}<span tal:condition=
-              "python:len(video.description) > 300">...</span>
-        <br>
-        <a tal:condition="python:voted == 1" 
-          href="${request.application_url}/vote_video/${video.id}/0">un-upvote</a>
-        <a tal:condition="python:voted == 0" 
-          href="${request.application_url}/vote_video/${video.id}/1">upvote</a> 
-        <span>score:${votes}</span>
-        <a tal:condition="python:logged_in == video.owner_handler" 
-          href="${request.application_url}/delete_video/${video.id}">delete</a>
-      </li>
-    </ul>  
-  </div>
+<div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Video links</a>
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li>
+          <a  tal:condition="logged_in"  
+              href="${request.application_url}/add_video">Submit a video</a>
+        </li>
+         <li>
+          <a  tal:condition="logged_in"  
+              href="${request.application_url}/logout">Logout ${logged_in}</a>
+        </li>
+        <li>
+          <a  tal:condition="not logged_in"  
+              href="${request.application_url}/login">Login</a>
+        </li>
+        <li>
+          <a  tal:condition="not logged_in"  
+              href="${request.application_url}/register">Register</a>
+        </li>
+      </ul>
+    </div><!-- /.nav-collapse -->
+  </div><!-- /.container -->
+</div><!-- /.navbar -->
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6" id="player">
+      <p class="pull-right visible-xs">
+        <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+      </p>
+      <div class="jumbotron">
+        <iframe width="640" height="390" src="https://www.youtube.com/embed/1hpU_Neg1KA" frameborder="0" allowfullscreen=""></iframe>
+        <h3>Hello, world!</h3>
+        <p>This is an example to show the potential of an offcanvas layout pattern in Bootstrap. Try some responsive-range viewport sizes to see it in action.</p>
+      </div>
+    </div><!--/span--> 
+  
+
+    <div class="col-md-6" id="sidebar">
+      <div class="row thumbnail-row" tal:repeat="(video, votes, voted) videos">
+        <div class="col-md-12">
+          <div class="thumbnail">
+            <iframe src="https://www.youtube.com/embed/1hpU_Neg1KA" frameborder="0" allowfullscreen=""></iframe>
+          </div>
+          <div>
+            <h4>${video.title}</h4>
+            <p>${video.description[:300]}<span tal:condition="python:len(video.description) > 300">...</span></p>
+          
+            <a  tal:condition="python:voted == 1" 
+                href="${request.application_url}/vote_video/${video.id}/0">un-upvote</a>
+            <a  tal:condition="python:voted == 0" 
+                href="${request.application_url}/vote_video/${video.id}/1">upvote</a> 
+            <span>score:${votes}</span>
+            <a  tal:condition="python:logged_in == video.owner_handler" 
+                href="${request.application_url}/delete_video/${video.id}">delete</a>
+          </div>    
+        </div> 
+      </div><!--/row-->
+    </div><!--/sidebar--> 
+  </div><!--/row-->   
+ 
+</div>
+
 </body>
 </html>
