@@ -47,6 +47,6 @@ def main(argv=sys.argv):
         DBSession.add(user)
         for i in range(0,100):
             video = Video(title="AMAZING STREET HACK", url="https://www.youtube.com/watch?v=1hpU_Neg1KA",
-                owner=user, description="An amazing smartphone app turns common people into powerful hackers and hidden cameras record their reaction as they unwillingly hack a street of Los Angeles. You won't believe what they do when the police show up! Experience the power of hacking in Watch Dogs on May 27, 2014.")
+                owner=user, description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla in hendrerit odio, sed venenatis lectus. Aenean placerat, justo id porttitor faucibus, sem lorem imperdiet odio, a vehicula risus nisi varius leo. Nulla imperdiet nunc fringilla imperdiet venenatis. Nullam eu mi cursus, consequat ipsum et, sodales arcu. In fermentum molestie leo in sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla in hendrerit odio, sed venenatis lectus. Aenean placerat, justo id porttitor faucibus, sem lorem imperdiet odio, a vehicula risus nisi varius leo. Nulla imperdiet nunc fringilla imperdiet venenatis. Nullam eu mi cursus, consequat ipsum et, sodales arcu. In fermentum molestie leo in sed.")
             DBSession.add(video)
         pass
