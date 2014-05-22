@@ -35,24 +35,27 @@ def frontpage(request):
 @view_config(route_name='add_video', renderer='templates/add_video.pt',
   permission='add_video')
 def add_video(request):
+  save_url = request.route_url('add_video')
+  topics = DBHelper.get_all_topics()
+  video = Video(title='', description='', url='', topic_id=0)
+  message = None
+
   if 'form.submitted' in request.params:
     title = request.params['title']
     description = request.params['description']
     url = request.params['url']
+    topic_id = request.params['topic']
     handler = request.authenticated_userid
-    user = DBHelper.get_user(handler)
-    if not user:
-      raise Exception("User not found. This is impossible!")
 
-    if title and description and url:
-      video = Video(title=title, description=description, url=url,
-        owner=user)
-      DBSession.add(video)
-    return HTTPFound(location=request.route_url('home'))
-    
-  save_url = request.route_url('add_video')
-  video = Video(title='', description='', url='')
-  return {'video':video, 'save_url':save_url}
+    video = Video(title=title, description=description, url=url,
+        owner_handler=handler, topic_id=topic_id)
+    if DBHelper.add_video(video):
+      return HTTPFound(location=request.route_url('home'))
+    else:
+      message = "Error while adding video"
+
+  return {'video':video, 'save_url':save_url, 
+      'topics':topics, 'message':message}
 
 @view_config(route_name='delete_video', permission='delete_video')
 def delete_video(request):

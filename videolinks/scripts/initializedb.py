@@ -1,7 +1,7 @@
 import os
 import sys
 import transaction
-
+import random
 from sqlalchemy import engine_from_config
 
 from pyramid.paster import (
@@ -14,7 +14,8 @@ from pyramid.scripts.common import parse_vars
 from ..models import (
     Video,
     Base,
-    User
+    User,
+    Topic
     )
 
 from ..DBHelper import DBSession
@@ -43,10 +44,20 @@ def main(argv=sys.argv):
 
     with transaction.manager:
         #add entries to database here
+
+        #default user
         user = User(handler="son", password="123123")
-        DBSession.add(user)
+
+        #default topics
+        topic0 = Topic(name="funny", 
+            description="This topic is for funny videos")
+        topic1 = Topic(name="sport",
+            description="Sport videos go here")
+
+        #add default videos, cascading user and topic
         for i in range(0,100):
             video = Video(title="AMAZING STREET HACK", url="https://www.youtube.com/watch?v=1hpU_Neg1KA",
-                owner=user, description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla in hendrerit odio, sed venenatis lectus. Aenean placerat, justo id porttitor faucibus, sem lorem imperdiet odio, a vehicula risus nisi varius leo. Nulla imperdiet nunc fringilla imperdiet venenatis. Nullam eu mi cursus, consequat ipsum et, sodales arcu. In fermentum molestie leo in sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla in hendrerit odio, sed venenatis lectus. Aenean placerat, justo id porttitor faucibus, sem lorem imperdiet odio, a vehicula risus nisi varius leo. Nulla imperdiet nunc fringilla imperdiet venenatis. Nullam eu mi cursus, consequat ipsum et, sodales arcu. In fermentum molestie leo in sed.")
+                owner=user, description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla in hendrerit odio, sed venenatis lectus. Aenean placerat, justo id porttitor faucibus, sem lorem imperdiet odio, a vehicula risus nisi varius leo. Nulla imperdiet nunc fringilla imperdiet venenatis. Nullam eu mi cursus, consequat ipsum et, sodales arcu. In fermentum molestie leo in sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla in hendrerit odio, sed venenatis lectus. Aenean placerat, justo id porttitor faucibus, sem lorem imperdiet odio, a vehicula risus nisi varius leo. Nulla imperdiet nunc fringilla imperdiet venenatis. Nullam eu mi cursus, consequat ipsum et, sodales arcu. In fermentum molestie leo in sed.",
+                topic=random.choice([topic0, topic1]))
             DBSession.add(video)
         pass

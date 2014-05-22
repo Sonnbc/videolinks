@@ -20,7 +20,14 @@
                 tal:content="video.title"/><br/>
       <label>Description:</label><textarea name="description" 
                 rows="10" cols="60" tal:content="video.description"/><br/>
-      <input type="submit" name="form.submitted" value="Save"/>          
+      <label>Topic:</label>
+      <select name="topic">
+        <option tal:repeat="t topics" 
+          tal:attributes="selected selected if video.topic_id==t.id else None"
+          value="${t.id}">${t.name}</option>
+      </select><br/>
+      <span tal:replace="message"/><br/>
+      <input type="submit" name="form.submitted" value="Save"/>        
     </form>
   
   </div>  

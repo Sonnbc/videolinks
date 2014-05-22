@@ -27,7 +27,7 @@ def get_feed(user_handler):
             user_handler=user_handler, video_id=x.id, vote_count=1).first() ]
   }
     
-  all_videos = sorted(all_videos, key=lambda x: votes[x.id][0], reverse=True)
+  all_videos = sorted(all_videos, key=lambda x: (votes[x.id][0], x.id), reverse=True)
   all_videos = [
     (x, votes[x.id][0], votes[x.id][1]) for x in all_videos[:9]
   ]

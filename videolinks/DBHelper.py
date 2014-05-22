@@ -1,7 +1,8 @@
 from .models import (
   User, 
   Video,
-  VideoVote
+  VideoVote,
+  Topic
   )
 
 from sqlalchemy.orm import (
@@ -13,6 +14,7 @@ from sqlalchemy.orm import (
 from zope.sqlalchemy import ZopeTransactionExtension
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import SQLAlchemyError
 
 from datetime import datetime
 
@@ -23,15 +25,30 @@ def get_user(handler):
   try:
     user = DBSession.query(User).filter_by(handler=handler).one()
     return user
-  except NoResultFound, e:
+  except NoResultFound:
     return None
 
 def get_video(id):
   try:
     video = DBSession.query(Video).filter_by(id=id).one()
     return video
-  except NoResultFound, e:
+  except NoResultFound:
     return None
+
+def add_video(video):
+  #TODO: move validation elsewhere
+  if not (video.url and video.title and video.description):
+    return False
+
+  try:
+    DBSession.add(video)
+    return True
+  except SQLAlchemyError:
+    return False
+
+def get_all_topics():
+  topics = DBSession.query(Topic).all()
+  return topics
 
 def vote_video(user_handler, video_id, vote_kind):
   vote_kind = int(vote_kind)

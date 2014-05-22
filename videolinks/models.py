@@ -70,6 +70,9 @@ class Video(Base):
   votes = relationship("VideoVote", backref="video", 
     cascade="all, delete, delete-orphan")
 
+  topic_id = Column(Integer, ForeignKey('topics.id'), nullable=False)
+  topic = relationship("Topic", backref="videos")
+
   @property
   def __acl__(self):
     acls = [ (Allow, self.owner_handler, 'delete_video') ]
@@ -100,6 +103,12 @@ class User(Base):
 
   votes = relationship("VideoVote", backref="user", 
     cascade="all, delete, delete-orphan")
+
+class Topic(Base):
+  __tablename__ = 'topics'
+  id = Column(Integer, primary_key=True)
+  name = Column(String(50), nullable=False, unique=True)
+  description = Column(Text)
 
 class VideoVote(Base):
   __tablename__ = "videovotes"
