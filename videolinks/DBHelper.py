@@ -1,4 +1,4 @@
-from .models import (
+from videolinks.models import (
   User, 
   Video,
   VideoVote,

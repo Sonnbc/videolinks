@@ -33,7 +33,9 @@ def frontpage(request):
   user_id = request.authenticated_userid
   user = DBHelper.get_user_from_id(user_id)
 
-  return {'videos': all_videos, 'logged_in': user}
+  topics = DBHelper.get_all_topics()
+
+  return {'videos': all_videos, 'logged_in': user, 'topics':topics}
 
 @view_config(route_name='add_video', renderer='templates/add_video.pt',
   permission='add_video')

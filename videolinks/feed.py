@@ -1,6 +1,6 @@
 from DBHelper import DBSession
 
-from .models import (
+from videolinks.models import (
   Video,
   User,
   VideoVote

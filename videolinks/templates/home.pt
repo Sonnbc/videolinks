@@ -70,6 +70,7 @@
           <a  tal:condition="python:voted == 0" 
               href="${request.application_url}/vote_video/${video.id}/1">upvote</a> 
           <span>score:${votes}</span>
+          <span>${video.topic.name}</span> 
           <a  tal:condition="python:logged_in and logged_in.id == video.owner_id" 
               href="${request.application_url}/delete_video/${video.id}">delete</a>
         </div>
