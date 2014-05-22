@@ -30,7 +30,10 @@ def frontpage(request):
   add_video_url = request.route_url('add_video')
   all_videos = feed.get_feed(request.authenticated_userid)
   
-  return {'videos': all_videos, 'logged_in': request.authenticated_userid}
+  user_id = request.authenticated_userid
+  user = DBHelper.get_user_from_id(user_id)
+
+  return {'videos': all_videos, 'logged_in': user}
 
 @view_config(route_name='add_video', renderer='templates/add_video.pt',
   permission='add_video')
@@ -45,10 +48,10 @@ def add_video(request):
     description = request.params['description']
     url = request.params['url']
     topic_id = request.params['topic']
-    handler = request.authenticated_userid
+    user_id = request.authenticated_userid
 
     video = Video(title=title, description=description, url=url,
-        owner_handler=handler, topic_id=topic_id)
+        owner_id=user_id, topic_id=topic_id)
     if DBHelper.add_video(video):
       return HTTPFound(location=request.route_url('home'))
     else:
@@ -72,14 +75,13 @@ def register(request):
   if 'form.submitted' in request.params:
     handler = request.params['handler']
     password = request.params['password']
-    user = DBHelper.get_user(handler)
-    if not user:
-      user = User(handler=handler, password=password)
-      DBSession.add(user)
-      headers = remember(request, handler)
+    user = DBHelper.add_user(handler, password)
+    if user:
+      headers = remember(request, user.id)
       return HTTPFound(location=request.route_url('home'),
                       headers = headers)
-    message = "Username taken"
+    else:    
+      message = "Username taken"
 
   return dict(
     message = message,
@@ -103,9 +105,10 @@ def login(request):
   if 'form.submitted' in request.params:
     handler = request.params['handler']
     password = request.params['password']
-    user = DBHelper.get_user(handler)
+    user = DBHelper.get_user_from_handler(handler)
+    print user.id, user.handler
     if user and user.authenticate(password):
-      headers = remember(request, handler)
+      headers = remember(request, user.id)
       return HTTPFound(location = came_from,
                        headers = headers)
     message = 'Failed login'

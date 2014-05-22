@@ -21,12 +21,28 @@ from datetime import datetime
 def groupfinder(handler, request):
   return []
 
-def get_user(handler):
+def add_user(handler, password):
+  user = get_user_from_handler(handler)
+  if not user:
+    user = User(handler=handler, password=password)
+    DBSession.add(user)
+    DBSession.flush() #flush to populate id for user
+    return user
+
+  return False
+
+def get_user(**f):
   try:
-    user = DBSession.query(User).filter_by(handler=handler).one()
+    user = DBSession.query(User).filter_by(**f).one()
     return user
   except NoResultFound:
     return None
+
+def get_user_from_handler(handler):
+  return get_user(handler=handler)
+
+def get_user_from_id(userid):
+  return get_user(id=userid)  
 
 def get_video(id):
   try:

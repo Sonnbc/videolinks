@@ -40,7 +40,7 @@
         </li>
          <li>
           <a  tal:condition="logged_in"  
-              href="${request.application_url}/logout">Logout ${logged_in}</a>
+              href="${request.application_url}/logout">Logout ${logged_in.handler}</a>
         </li>
         <li>
           <a  tal:condition="not logged_in"  
@@ -70,7 +70,7 @@
           <a  tal:condition="python:voted == 0" 
               href="${request.application_url}/vote_video/${video.id}/1">upvote</a> 
           <span>score:${votes}</span>
-          <a  tal:condition="python:logged_in == video.owner_handler" 
+          <a  tal:condition="python:logged_in and logged_in.id == video.owner_id" 
               href="${request.application_url}/delete_video/${video.id}">delete</a>
         </div>
       </div><!--/video-info--> 

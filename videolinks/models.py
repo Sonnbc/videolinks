@@ -64,7 +64,7 @@ class Video(Base):
   title = Column(String(200), nullable=False)
   description = Column(Text)
   extra = Column(PickleType)
-  owner_handler = Column(Integer, ForeignKey('users.handler'))
+  owner_id = Column(Integer, ForeignKey('users.id'))
   owner = relationship("User")
 
   votes = relationship("VideoVote", backref="video", 
@@ -82,7 +82,8 @@ class User(Base):
   __tablename__ = 'users'
   __hashed_password = Column(Integer, nullable=False)
 
-  handler = Column(String(50), primary_key=True)
+  id = Column(Integer, primary_key=True)
+  handler = Column(String(50), unique=True)
   
   @property
   def password(self):
