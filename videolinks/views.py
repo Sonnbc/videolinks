@@ -133,15 +133,32 @@ def logout(request):
 #TODO: this is not really efficient (have to reload the whole referer page)
 @view_config(route_name='vote_video')
 def vote_video(request):
-  handler = request.authenticated_userid
+  user_id = request.authenticated_userid
   vote = request.matchdict['vote']
   video_id = request.matchdict['video_id']
-  DBHelper.vote_video(handler, video_id, vote)
+  DBHelper.vote_video(user_id, video_id, vote)
 
+  return last_location_or_home(request)
+
+@view_config(route_name='subscribe_topic')
+def subscribe_topic(request):
+  user_id = request.authenticated_userid
+  topic_id = request.matchdict['topic_id']
+  DBHelper.subscribe_topic(user_id, topic_id)
+
+  return last_location_or_home(request)
+
+@view_config(route_name='unsubscribe_topic')
+def unsubscribe_topic(request):
+  user_id = request.authenticated_userid
+  topic_id = request.matchdict['topic_id']
+  DBHelper.unsubscribe_topic(user_id, topic_id)
+
+  return last_location_or_home(request)  
+
+def last_location_or_home(request):
   referrer = request.referrer
-  this_url = request.route_url('vote_video', video_id=video_id, vote=vote)
-
-  if (not referrer) or referrer == this_url:
+  if (not referrer) or referrer == request.url:
     referrer = request.route_url('home')
 
   return HTTPFound(location = referrer)

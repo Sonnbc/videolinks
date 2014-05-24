@@ -8,7 +8,7 @@ from videolinks.models import (
 
 from sqlalchemy.sql import func
 
-def get_feed(user_handler):
+def get_feed(user_id):
   #sort by votes count
   #currently returns only 9 videos
   #TODO: try to be more efficient. perhaps 1 SQL call only?
@@ -24,7 +24,7 @@ def get_feed(user_handler):
     for x in all_videos    
     for y in 
       [ DBSession.query(VideoVote).filter_by(
-            user_handler=user_handler, video_id=x.id, vote_count=1).first() ]
+            user_id=user_id, video_id=x.id, vote_count=1).first() ]
   }
     
   all_videos = sorted(all_videos, key=lambda x: (votes[x.id][0], x.id), reverse=True)

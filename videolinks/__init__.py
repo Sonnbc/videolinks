@@ -23,6 +23,9 @@ def add_route(config):
     config.add_route('vote_video', '/vote_video/{video_id}/{vote}',
         traverse='/videos')
 
+    config.add_route('subscribe_topic', '/subscribe_topic/{topic_id}')
+    config.add_route('unsubscribe_topic', '/unsubscribe_topic/{topic_id}')
+
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.

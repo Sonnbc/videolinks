@@ -8,6 +8,9 @@ class User(Base):
   id = Column(Integer, primary_key=True)
   handler = Column(String(50), unique=True)
   
+  ####################################################################
+  ## security
+  ####################################################################
   @property
   def password(self):
      raise Exception("Retrieving password is not possible")
@@ -25,5 +28,9 @@ class User(Base):
   def hash(self, value):
     return hashlib.sha512(value + salt).hexdigest()
 
+  ####################################################################  
+
   votes = relationship("VideoVote", backref="user", 
+    cascade="all, delete, delete-orphan")
+  subscriptions = relationship("TopicSubscription", backref="user",
     cascade="all, delete, delete-orphan")

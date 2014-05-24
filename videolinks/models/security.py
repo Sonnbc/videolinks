@@ -10,6 +10,9 @@ from .meta import *
 class RootFactory(dict):
   __acl__ = [ (Allow, 'g:admin', ALL_PERMISSIONS) ]
 
+  __acl__ += [(Allow, Authenticated, 'subscribe_topic'),
+              (Allow, Authenticated, 'unsubscribe_topic')]
+
   
   def __init__(self, request):
     self.request = request
@@ -26,10 +29,9 @@ class VideoFactory(object):
   def __getitem__(self, key):
     from .. import DBHelper
     video = DBHelper.get_video(key)
-    print video
     if video is None:
       raise KeyError
     
     video.__parent__ = self
     video.__name__ = key
-    return video 
+    return video

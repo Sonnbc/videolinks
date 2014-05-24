@@ -1,6 +1,9 @@
 from .meta import *
 from pyramid.security import Allow
 
+from .user import User
+from .topic import Topic
+
 class Video(Base):
   __tablename__ = 'videos'
   id = Column(Integer, primary_key=True)
@@ -8,13 +11,13 @@ class Video(Base):
   title = Column(String(200), nullable=False)
   description = Column(Text)
   extra = Column(PickleType)
-  owner_id = Column(Integer, ForeignKey('users.id'))
+  owner_id = Column(Integer, ForeignKey(User.id))
   owner = relationship("User")
 
   votes = relationship("VideoVote", backref="video", 
     cascade="all, delete, delete-orphan")
 
-  topic_id = Column(Integer, ForeignKey('topics.id'), nullable=False)
+  topic_id = Column(Integer, ForeignKey(Topic.id), nullable=False)
   topic = relationship("Topic", backref="videos")
 
   @property
@@ -24,9 +27,9 @@ class Video(Base):
 
 class VideoVote(Base):
   __tablename__ = "videovotes"
-  user_handler = Column(String(50), ForeignKey('users.handler'), 
+  user_id = Column(Integer, ForeignKey(User.id), 
     primary_key=True)
-  video_id = Column(Integer, ForeignKey('videos.id'),
+  video_id = Column(Integer, ForeignKey(Video.id),
     primary_key=True)
 
   vote_time = Column(DateTime)
