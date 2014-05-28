@@ -136,7 +136,9 @@ def vote_video(request):
   user_id = request.authenticated_userid
   vote = request.matchdict['vote']
   video_id = request.matchdict['video_id']
-  DBHelper.vote_video(user_id, video_id, vote)
+  topic_id = DBHelper.get_video(video_id).topic_id
+  change = DBHelper.vote_video(user_id, video_id, vote)
+  feed.update_video_score(video_id, topic_id, change)
 
   return last_location_or_home(request)
 

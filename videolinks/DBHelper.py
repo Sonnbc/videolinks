@@ -66,19 +66,32 @@ def get_all_topics():
   return topics
 
 def vote_video(user_id, video_id, vote_kind):
-  vote_kind = int(vote_kind)
   #don't allow downvote for now
+  #return the actual change in vote, ie: vote_kind - current vote
+
+  #0: unvote, 1:upvote
+  vote_kind = int(vote_kind)
   if vote_kind not in [0, 1]:
     return
 
   try:
     vote = DBSession.query(VideoVote).filter_by(
       user_id=user_id, video_id=video_id).one()
+    res = vote_kind - vote.vote_count
     vote.vote_count = vote_kind
   except exc.NoResultFound:
     vote = VideoVote(user_id=user_id, video_id=video_id,
       vote_time=datetime.now(), vote_count=vote_kind)
+    res = vote_kind
     DBSession.add(vote)
+
+  return res
+
+def vote_by_user(video_id, user_id):
+  res = DBSession.query(VideoVote).filter_by(
+    user_id=user_id, video_id=x.id, vote_count=1).first() or 0
+  return res
+
 
 def subscribe_topic(user_id, topic_id):
   subscription = TopicSubscription(user_id=user_id, topic_id=topic_id)
