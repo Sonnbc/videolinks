@@ -50,24 +50,24 @@ class Feed():
     r.hincrby(hname, key, change)
 
   def zname(self, topic_id):
-    return "topic." + str(topic_id)
+    return "feed.topic." + str(topic_id)
 
   def compose_index(self, video_id, topic_id):
-    hname = "vhash." + str(video_id / self.VIDEOS_PER_HASH)
+    hname = "feed.vhash." + str(video_id / self.VIDEOS_PER_HASH)
     key =  str(video_id % self.VIDEOS_PER_HASH) + ".topic_id." + str(topic_id)
     return hname, key
 
   def decompose_index(self, hname, key):
     h = hname.split(".")
     k = key.split(".")
-    video_id = int(h[1])*self.VIDEOS_PER_HASH + int(k[0])
+    video_id = int(h[2])*self.VIDEOS_PER_HASH + int(k[0])
     topic_id = int(k[2])
     return video_id, topic_id
   
   def consume_video_score(self, relax_per_iteration):
     r = self.redis_connection
     while True:
-      for hname in r.keys("vhash*"):
+      for hname in r.keys("feed.vhash*"):
         for key in r.hkeys(hname):
           pipe = r.pipeline()
           pipe.hget(hname, key)

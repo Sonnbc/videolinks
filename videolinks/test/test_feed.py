@@ -8,9 +8,9 @@ from time import sleep
 class TestFeed:
   def clean_redis(self):
     r = self.feed.redis_connection
-    for x in r.keys("vhash*"):
+    for x in r.keys("feed.vhash*"):
       r.delete(x)
-    for x in r.keys("topic*"):
+    for x in r.keys("feed.topic*"):
       r.delete(x)
 
   def setUp(self):
@@ -20,14 +20,14 @@ class TestFeed:
   
   def tearDown(self):
     self.consumer.kill()
-    #self.clean_redis()
+    self.clean_redis()
 
   def test_compose_index_1(self):
     video_id, topic_id = 123, 45
     a = self.feed.compose_index(video_id, topic_id)
     
     assert(self.feed.compose_index(video_id, topic_id) == 
-      ("vhash.0", "123.topic_id.45"))
+      ("feed.vhash.0", "123.topic_id.45"))
     assert((video_id, topic_id) == self.feed.decompose_index(*a))
 
 
@@ -36,14 +36,14 @@ class TestFeed:
     a = self.feed.compose_index(video_id, topic_id)
 
     assert(self.feed.compose_index(video_id, topic_id) == 
-      ("vhash.123", "456.topic_id.78"))
+      ("feed.vhash.123", "456.topic_id.78"))
     assert((video_id, topic_id) == self.feed.decompose_index(*a))
 
   def test_feed(self):
     num_videos = 2000
     num_topics = 10
     get_topic = lambda x: x % num_topics
-    iterations = 1
+    iterations = 2
 
     args = [(x, get_topic(x)) for x in range(num_videos)*iterations]
     shuffle(args)
