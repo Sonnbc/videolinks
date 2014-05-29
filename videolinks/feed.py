@@ -3,6 +3,7 @@ from videolinks.models import Video, User, VideoVote
 from sqlalchemy.sql import func
 import redis
 from time import sleep
+import DBHelper
 
 class Feed():
   MAX_VIDEOS_PER_TOPIC = 150
@@ -16,14 +17,14 @@ class Feed():
   def redis_connection(self):
     return self._redis  
 
-  def build_feed(self, user_id, start, end, *topics):
+  def build_feed(self, user_id, topics, start=0, end=25):
     #sort by votes count, unnormalized
-    hottest = hottest_videos(topics)
+    hottest = self.hottest_videos(topics)
 
     #each item is (video, score, vote by this user)
     videos = [ ( DBHelper.get_video(x[0]), 
                  x[1], 
-                 DBHelper.vote_by_user(user_id)
+                 DBHelper.vote_by_user(x[0], user_id)
                )
                for x in hottest[start:end]
              ]

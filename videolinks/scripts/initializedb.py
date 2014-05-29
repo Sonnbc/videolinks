@@ -19,6 +19,7 @@ from ..models import (
     )
 
 from ..DBHelper import DBSession
+from ..feed import Feed
 
 
 def usage(argv):
@@ -54,10 +55,14 @@ def main(argv=sys.argv):
         topic1 = Topic(name="sport",
             description="Sport videos go here")
 
+        feed = Feed()
         #add default videos, cascading user and topic
         for i in range(0,100):
             video = Video(title="AMAZING STREET HACK", url="https://www.youtube.com/watch?v=1hpU_Neg1KA",
                 owner=user, description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla in hendrerit odio, sed venenatis lectus. Aenean placerat, justo id porttitor faucibus, sem lorem imperdiet odio, a vehicula risus nisi varius leo. Nulla imperdiet nunc fringilla imperdiet venenatis. Nullam eu mi cursus, consequat ipsum et, sodales arcu. In fermentum molestie leo in sed. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla in hendrerit odio, sed venenatis lectus. Aenean placerat, justo id porttitor faucibus, sem lorem imperdiet odio, a vehicula risus nisi varius leo. Nulla imperdiet nunc fringilla imperdiet venenatis. Nullam eu mi cursus, consequat ipsum et, sodales arcu. In fermentum molestie leo in sed.",
                 topic=random.choice([topic0, topic1]))
             DBSession.add(video)
+            DBSession.flush()
+            #add video to feed
+            feed.update_video_score(video.id, video.topic_id, 0)
         pass

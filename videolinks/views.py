@@ -1,40 +1,26 @@
 from pyramid.response import Response
-from pyramid.view import (
-    view_config,
-    forbidden_view_config,
-    )
-from pyramid.security import (
-    remember,
-    forget,
-    )
+from pyramid.view import view_config, forbidden_view_config
+from pyramid.security import remember, forget
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from sqlalchemy.exc import DBAPIError
 
-from pyramid.httpexceptions import (
-    HTTPFound,
-    HTTPNotFound,
-    )
-
-from .models import (
-  Video,
-  User
-  )
-
+from .models import Video, User
 import DBHelper
 from DBHelper import DBSession
-import feed
+from feed import Feed
 
 
 @view_config(route_name='home', renderer='templates/home.pt')
 def frontpage(request):
   add_video_url = request.route_url('add_video')
-  all_videos = feed.get_feed(request.authenticated_userid)
-  
   user_id = request.authenticated_userid
   user = DBHelper.get_user_from_id(user_id)
-
   topics = DBHelper.get_all_topics()
+  topic_ids = [x.id for x in topics]
 
+  feed = Feed()
+  all_videos = feed.build_feed(user_id, topic_ids)
   return {'videos': all_videos, 'logged_in': user, 'topics':topics}
 
 @view_config(route_name='add_video', renderer='templates/add_video.pt',
@@ -55,6 +41,8 @@ def add_video(request):
     video = Video(title=title, description=description, url=url,
         owner_id=user_id, topic_id=topic_id)
     if DBHelper.add_video(video):
+      feed = Feed()
+      feed.update_video_score(video_id, topic_id, 0)
       return HTTPFound(location=request.route_url('home'))
     else:
       message = "Error while adding video"
@@ -129,18 +117,17 @@ def logout(request):
   return HTTPFound(location = request.route_url('home'),
                    headers = headers)
 
-#TODO: this should not be a view handler (just REST)
-#TODO: this is not really efficient (have to reload the whole referer page)
-@view_config(route_name='vote_video')
+@view_config(route_name='vote_video', renderer='json')
 def vote_video(request):
   user_id = request.authenticated_userid
   vote = request.matchdict['vote']
-  video_id = request.matchdict['video_id']
+  video_id = int(request.matchdict['video_id'])
   topic_id = DBHelper.get_video(video_id).topic_id
   change = DBHelper.vote_video(user_id, video_id, vote)
+  feed = Feed()
   feed.update_video_score(video_id, topic_id, change)
 
-  return last_location_or_home(request)
+  return {'change': change}
 
 @view_config(route_name='subscribe_topic')
 def subscribe_topic(request):

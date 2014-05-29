@@ -89,7 +89,7 @@ def vote_video(user_id, video_id, vote_kind):
 
 def vote_by_user(video_id, user_id):
   res = DBSession.query(VideoVote).filter_by(
-    user_id=user_id, video_id=x.id, vote_count=1).first() or 0
+    user_id=user_id, video_id=video_id, vote_count=1).first() or 0
   return res
 
 
